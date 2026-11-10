@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kalkulator</title>
+
+    <!-- Inter dipakai sebagai cadangan di perangkat non-Apple; di Mac/iPhone otomatis pakai SF Pro -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        color-scheme: light dark;
+
+        --wallpaper: linear-gradient(
+          135deg,
+          #b9cdf5 0%,
+          #d9c9f0 50%,
+          #f3d5e4 100%
+        );
+        --window: rgba(246, 246, 248, 0.78);
+        --titlebar: rgba(236, 236, 240, 0.7);
+        --group: #ffffff;
+        --fill: rgba(118, 118, 128, 0.12);
+        --thumb: #ffffff;
+        --label: #000000;
+        --label-2: rgba(60, 60, 67, 0.6);
+        --label-3: rgba(60, 60, 67, 0.3);
+        --separator: rgba(60, 60, 67, 0.18);
+        --window-border: rgba(0, 0, 0, 0.12);
+        --blue: #007aff;
+        --blue-tint: rgba(0, 122, 255, 0.1);
+        --red: #ff3b30;
+        --shadow:
+          0 22px 60px rgba(30, 30, 60, 0.28), 0 0 0 0.5px rgba(0, 0, 0, 0.2);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --wallpaper: linear-gradient(
+            135deg,
+            #0f1a3d 0%,
+            #2b1b4d 55%,
+            #4a2142 100%
+          );
+          --window: rgba(36, 36, 40, 0.78);
+          --titlebar: rgba(48, 48, 54, 0.7);
+          --group: #2c2c2e;
+          --fill: rgba(118, 118, 128, 0.32);
+          --thumb: #636366;
+          --label: #ffffff;
+          --label-2: rgba(235, 235, 245, 0.6);
+          --label-3: rgba(235, 235, 245, 0.3);
+          --separator: rgba(84, 84, 88, 0.55);
+          --window-border: rgba(255, 255, 255, 0.14);
+          --blue: #0a84ff;
+          --blue-tint: rgba(10, 132, 255, 0.18);
+          --red: #ff453a;
+          --shadow:
+            0 22px 60px rgba(0, 0, 0, 0.55),
+            0 0 0 0.5px rgba(255, 255, 255, 0.12);
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 48px 20px;
+        background: var(--wallpaper) fixed;
+        color: var(--label);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+          "Inter", system-ui, "Segoe UI", sans-serif;
+        font-size: 17px;
+        line-height: 1.35;
+        letter-spacing: -0.01em;
+        font-variant-numeric: tabular-nums;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ---------- Jendela macOS ---------- */
+      .window {
+        width: 100%;
+        max-width: 680px;
+        border-radius: 14px;
+        background: var(--window);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        backdrop-filter: blur(40px) saturate(180%);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .titlebar {
+        position: relative;
+        display: flex;
+        align-items: center;
+        height: 52px;
+        padding: 0 18px;
+        background: var(--titlebar);
+        border-bottom: 0.5px solid var(--separator);
+      }
+      .lights {
+        display: flex;
+        gap: 8px;
+      }
+      .lights i {
+        display: block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.18);
+      }
+      .lights i:nth-child(1) {
+        background: #ff5f57;
+      }
+      .lights i:nth-child(2) {
+        background: #febc2e;
+      }
+      .lights i:nth-child(3) {
+        background: #28c840;
+      }
+      .titlebar h1 {
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin: 0;
+        text-align: center;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        pointer-events: none;
+      }
+
+      .content {
+        padding: 24px 24px 28px;
+      }
+
+      /* ---------- Banner mode ubah ---------- */
+      .edit-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+        padding: 11px 16px;
+        border-radius: 12px;
+        background: var(--blue-tint);
+        color: var(--blue);
+        font-size: 0.9375rem;
+      }
+      .edit-bar a {
+        color: var(--blue);
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .edit-bar a:hover {
+        opacity: 0.7;
+      }
+
+      /* ---------- Layar hasil ala iPhone ---------- */
+      .display {
+        padding: 4px 6px 22px;
+        text-align: right;
+        min-height: 128px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
+      .display .expr {
+        min-height: 1.4em;
+        color: var(--label-2);
+        font-size: 1.25rem;
+        font-weight: 300;
+      }
+      .display .value {
+        font-size: 4.5rem;
+        font-weight: 200;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .display .value.idle {
+        color: var(--label-3);
+      }
+
+      /* ---------- Grouped list (gaya Settings) ---------- */
+      .group {
+        background: var(--group);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .group .line {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        min-height: 52px;
+        padding: 0 16px;
+      }
+      .group .line + .line {
+        border-top: 0.5px solid var(--separator);
+        margin-left: 16px;
+        padding-left: 0;
+        padding-right: 16px;
+      }
+      .group label.name {
+        font-size: 1.0625rem;
+      }
+      .group input[type="number"] {
+        flex: 1;
+        min-width: 0;
+        height: 50px;
+        border: 0;
+        background: transparent;
+        color: var(--label);
+        text-align: right;
+        font: inherit;
+        font-size: 1.375rem;
+        font-weight: 400;
+        -moz-appearance: textfield;
+      }
+      .group input[type="number"]::-webkit-outer-spin-button,
+      .group input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      .group input[type="number"]::placeholder {
+        color: var(--label-3);
+      }
+      .group input[type="number"]:focus {
+        outline: none;
+        caret-color: var(--blue);
+      }
+      .group .line:focus-within label.name {
+        color: var(--blue);
+      }
+
+      /* ---------- Segmented control ---------- */
+      .segmented {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        margin-top: 18px;
+        padding: 2px;
+        gap: 2px;
+        border-radius: 10px;
+        background: var(--fill);
+      }
+      .segmented label {
+        position: relative;
+        display: block;
+      }
+      .segmented input {
+        position: absolute;
+        inset: 0;
+        margin: 0;
+        opacity: 0;
+        cursor: pointer;
+      }
+      .segmented span {
+        display: grid;
+        place-items: center;
+        height: 40px;
+        border-radius: 8px;
+        font-size: 1.375rem;
+        font-weight: 400;
+        color: var(--label);
+        transition:
+          background 0.18s ease,
+          box-shadow 0.18s ease;
+      }
+      .segmented input:checked + span {
+        background: var(--thumb);
+        box-shadow:
+          0 3px 8px rgba(0, 0, 0, 0.12),
+          0 3px 1px rgba(0, 0, 0, 0.04);
+        font-weight: 500;
+      }
+      .segmented input:focus-visible + span {
+        outline: 3px solid color-mix(in srgb, var(--blue) 55%, transparent);
+        outline-offset: 1px;
+      }
+
+      /* ---------- Tombol utama ---------- */
+      .btn-primary {
+        width: 100%;
+        height: 50px;
+        margin-top: 18px;
+        border: 0;
+        border-radius: 12px;
+        background: var(--blue);
+        color: #fff;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          filter 0.15s,
+          transform 0.1s;
+      }
+      .btn-primary:hover {
+        filter: brightness(1.08);
+      }
+      .btn-primary:active {
+        filter: brightness(0.9);
+        transform: scale(0.995);
+      }
+      .btn-primary:focus-visible {
+        outline: 3px solid color-mix(in srgb, var(--blue) 45%, transparent);
+        outline-offset: 2px;
+      }
+
+      /* ---------- Riwayat ---------- */
+      .history {
+        margin-top: 34px;
+      }
+      .history-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 0 6px 10px;
+      }
+      .history-head h2 {
+        margin: 0;
+        font-size: 1.375rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .history-head span {
+        color: var(--label-2);
+        font-size: 0.9375rem;
+      }
+
+      .entry {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        align-items: center;
+        gap: 18px;
+        min-height: 60px;
+        padding: 10px 16px;
+      }
+      .entry + .entry {
+        border-top: 0.5px solid var(--separator);
+        margin-left: 16px;
+        padding-left: 0;
+      }
+      .entry .formula {
+        color: var(--label-2);
+        font-size: 1.0625rem;
+        overflow-wrap: anywhere;
+      }
+      .entry .formula .sym {
+        padding: 0 0.4em;
+        color: var(--label);
+      }
+      .entry .answer {
+        font-size: 1.1875rem;
+        font-weight: 600;
+        text-align: right;
+        overflow-wrap: anywhere;
+      }
+
+      .entry .actions {
+        display: flex;
+        gap: 6px;
+      }
+      .pill {
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: var(--blue-tint);
+        color: var(--blue);
+        font-size: 0.9375rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: opacity 0.15s;
+      }
+      .pill:hover {
+        opacity: 0.75;
+      }
+      .pill.danger {
+        background: rgba(255, 59, 48, 0.12);
+        color: var(--red);
+      }
+      .pill:focus-visible {
+        outline: 3px solid color-mix(in srgb, var(--blue) 45%, transparent);
+      }
+
+      .empty {
+        padding: 36px 20px;
+        text-align: center;
+        color: var(--label-2);
+        font-size: 0.9375rem;
+      }
+
+      /* ---------- Responsif ---------- */
+      @media (max-width: 600px) {
+        body {
+          padding: 0;
+          align-items: stretch;
+        }
+        .window {
+          border-radius: 0;
+          max-width: none;
+          min-height: 100vh;
+          box-shadow: none;
+        }
+        .content {
+          padding: 18px 16px 28px;
+        }
+        .display .value {
+          font-size: 3.5rem;
+        }
+        .entry {
+          grid-template-columns: 1fr auto;
+          row-gap: 8px;
+        }
+        .entry .actions {
+          grid-column: 1 / -1;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="window">
+      <div class="titlebar">
+        <div class="lights" aria-hidden="true"><i></i><i></i><i></i></div>
+        <h1>Kalkulator</h1>
+      </div>
+
+      <main class="content">
+        <div class="edit-bar" th:if="${kalkulator.id != null}">
+          <span>Sedang mengubah perhitungan</span>
+          <a th:href="@{/kalkulator}">Batal</a>
+        </div>
+
+        <form
+          action="#"
+          th:action="@{/kalkulator/simpan}"
+          th:object="${kalkulator}"
+          method="post"
+          id="form-hitung"
+        >
+          <input type="hidden" th:field="*{id}" />
+
+          <!-- Layar -->
+          <div class="display" aria-live="polite">
+            <div class="expr" id="expr">&nbsp;</div>
+            <div class="value idle" id="preview">0</div>
+          </div>
+
+          <!-- Input -->
+          <div class="group">
+            <div class="line">
+              <label class="name" for="bilangan1">Angka pertama</label>
+              <input
+                type="number"
+                step="any"
+                th:field="*{bilangan1}"
+                placeholder="0"
+                required
+              />
+            </div>
+            <div class="line">
+              <label class="name" for="bilangan2">Angka kedua</label>
+              <input
+                type="number"
+                step="any"
+                th:field="*{bilangan2}"
+                placeholder="0"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Operator -->
+          <div class="segmented" role="radiogroup" aria-label="Operator">
+            <label title="Tambah">
+              <input
+                type="radio"
+                th:field="*{operator}"
+                th:value="'+'"
+                required
+              />
+              <span>+</span>
+            </label>
+            <label title="Kurang">
+              <input type="radio" th:field="*{operator}" th:value="'-'" />
+              <span>&minus;</span>
+            </label>
+            <label title="Kali">
+              <input type="radio" th:field="*{operator}" th:value="'x'" />
+              <span>&times;</span>
+            </label>
+            <label title="Bagi">
+              <input type="radio" th:field="*{operator}" th:value="':'" />
+              <span>&divide;</span>
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            class="btn-primary"
+            th:text="${kalkulator.id != null} ? 'Simpan perubahan' : 'Simpan'"
+          >
+            Simpan
+          </button>
+        </form>
+
+        <!-- Riwayat -->
+        <section class="history">
+          <div class="history-head">
+            <h2>Riwayat</h2>
+            <span
+              th:unless="${#lists.isEmpty(listData)}"
+              th:text="${#lists.size(listData)} + ' perhitungan'"
+              >3 perhitungan</span
+            >
+          </div>
+
+          <div class="group">
+            <div class="entry" th:each="data : ${listData}">
+              <div class="formula">
+                <span
+                  th:text="${data.bilangan1 % 1 == 0 ? #numbers.formatDecimal(data.bilangan1, 0, 0) : data.bilangan1}"
+                  >8</span
+                ><span
+                  class="sym"
+                  th:text="${data.operator == 'x' ? '×' : (data.operator == ':' ? '÷' : (data.operator == '-' ? '−' : data.operator))}"
+                  >×</span
+                ><span
+                  th:text="${data.bilangan2 % 1 == 0 ? #numbers.formatDecimal(data.bilangan2, 0, 0) : data.bilangan2}"
+                  >2</span
+                >
+              </div>
+
+              <div
+                class="answer"
+                th:text="'= ' + ${data.hasil % 1 == 0 ? #numbers.formatDecimal(data.hasil, 0, 0) : data.hasil}"
+              >
+                = 16
+              </div>
+
+              <div class="actions">
+                <a
+                  class="pill"
+                  th:href="@{/kalkulator/edit/{id}(id=${data.id})}"
+                  >Ubah</a
+                >
+                <a
+                  class="pill danger"
+                  th:href="@{/kalkulator/hapus/{id}(id=${data.id})}"
+                  onclick="return confirm('Hapus perhitungan ini?');"
+                  >Hapus</a
+                >
+              </div>
+            </div>
+
+            <div class="empty" th:if="${#lists.isEmpty(listData)}">
+              Belum ada perhitungan. Isi dua angka di atas lalu ketuk Hitung.
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      // Pratinjau langsung di layar (hasil final tetap dihitung oleh server)
+      (function () {
+        var form = document.getElementById("form-hitung");
+        var val = document.getElementById("preview");
+        var expr = document.getElementById("expr");
+        var a = form.querySelector("[name=bilangan1]");
+        var b = form.querySelector("[name=bilangan2]");
+        var SYM = { "+": "+", "-": "\u2212", x: "\u00d7", ":": "\u00f7" };
+
+        function fmt(n) {
+          return String(parseFloat(n.toFixed(10)));
+        }
+
+        function update() {
+          var op = form.querySelector("[name=operator]:checked");
+          var x = parseFloat(a.value),
+            y = parseFloat(b.value);
+
+          if (isNaN(x) || isNaN(y) || !op) {
+            val.textContent = "0";
+            val.classList.add("idle");
+            expr.innerHTML = "&nbsp;";
+            val.style.fontSize = "";
+            return;
+          }
+
+          var r = 0;
+          switch (op.value) {
+            case "+":
+              r = x + y;
+              break;
+            case "-":
+              r = x - y;
+              break;
+            case "x":
+              r = x * y;
+              break;
+            case ":":
+              r = y !== 0 ? x / y : 0;
+              break;
+          }
+          var text = fmt(r);
+          expr.textContent = fmt(x) + " " + SYM[op.value] + " " + fmt(y);
+          val.textContent = text;
+          val.classList.remove("idle");
+
+          // perkecil huruf kalau angkanya panjang, seperti kalkulator iPhone
+          var size = text.length > 12 ? 2.4 : text.length > 9 ? 3.2 : null;
+          val.style.fontSize = size ? size + "rem" : "";
+        }
+
+        form.addEventListener("input", update);
+        form.addEventListener("change", update);
+        update();
+      })();
+    </script>
+  </body>
+</html>
