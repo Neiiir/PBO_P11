@@ -1,0 +1,8 @@
+<!DOCTYPE html><html lang="id" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title th:text="${judul} + ' | OMIBAT'">Form Obat</title><link rel="stylesheet" th:href="@{/css/style.css}"></head><body>
+<div th:replace="~{fragments/navbar :: nav}"></div><main class="container narrow"><div class="page-heading"><div><div class="eyebrow">DATA OBAT</div><h1 th:text="${judul}">Form Obat</h1><p>Isi informasi obat dengan benar.</p></div></div>
+<form class="panel form-panel" th:action="@{/obat/simpan}" th:object="${obat}" method="post"><input type="hidden" th:field="*{id}">
+<label>Nama obat <input type="text" th:field="*{namaObat}" placeholder="Contoh: Amlodipine" required></label>
+<label>Dosis <input type="text" th:field="*{dosis}" placeholder="Contoh: 5 mg"></label>
+<label>Aturan minum <input type="text" th:field="*{aturanMinum}" placeholder="Contoh: 1 kali sehari"></label>
+<label>Keterangan <textarea th:field="*{keterangan}" rows="3" placeholder="Catatan tambahan (opsional)"></textarea></label>
+<div class="form-actions"><a class="btn secondary" th:href="@{/obat}">Batal</a><button class="btn primary" type="submit">Simpan Data</button></div></form></main></body></html>

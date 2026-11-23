@@ -1,0 +1,9 @@
+<!DOCTYPE html><html lang="id" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title th:text="${judul} + ' | OMIBAT'">Form Kontrol</title><link rel="stylesheet" th:href="@{/css/style.css}"></head><body>
+<div th:replace="~{fragments/navbar :: nav}"></div><main class="container narrow"><div class="page-heading"><div><div class="eyebrow">AGENDA KESEHATAN</div><h1 th:text="${judul}">Form Kontrol</h1><p>Masukkan informasi kunjungan dokter.</p></div></div>
+<form class="panel form-panel" th:action="@{/kontrol/simpan}" th:object="${kontrol}" method="post"><input type="hidden" th:field="*{id}">
+<label>Nama dokter <input type="text" th:field="*{namaDokter}" placeholder="Contoh: dr. Andi" required></label>
+<label>Tanggal kontrol <input type="date" th:field="*{tanggalKontrol}" required></label>
+<label>Jam kontrol <input type="time" th:field="*{jamKontrol}"></label>
+<label>Lokasi <input type="text" th:field="*{lokasi}" placeholder="Nama rumah sakit / klinik"></label>
+<label>Catatan <textarea th:field="*{catatan}" rows="3" placeholder="Catatan persiapan atau informasi tambahan"></textarea></label>
+<div class="form-actions"><a class="btn secondary" th:href="@{/kontrol}">Batal</a><button class="btn primary" type="submit">Simpan Kontrol</button></div></form></main></body></html>

@@ -1,0 +1,9 @@
+<!DOCTYPE html><html lang="id" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title th:text="${judul} + ' | OMIBAT'">Form Jadwal</title><link rel="stylesheet" th:href="@{/css/style.css}"></head><body>
+<div th:replace="~{fragments/navbar :: nav}"></div><main class="container narrow"><div class="page-heading"><div><div class="eyebrow">JADWAL MINUM OBAT</div><h1 th:text="${judul}">Form Jadwal</h1><p>Pastikan waktu dan aturan minum sesuai arahan tenaga kesehatan.</p></div></div>
+<form class="panel form-panel" th:action="@{/jadwal/simpan}" th:object="${jadwal}" method="post"><input type="hidden" th:field="*{id}">
+<label>Pilih obat <select name="obatId" required><option value="">-- Pilih obat --</option><option th:each="o : ${daftarObat}" th:value="${o.id}" th:text="${o.namaObat}" th:selected="${jadwal.obat != null and jadwal.obat.id == o.id}"></option></select></label>
+<label>Waktu minum <input type="time" th:field="*{waktuMinum}" required></label>
+<label>Frekuensi <input type="text" th:field="*{frekuensi}" placeholder="Contoh: 1 kali sehari"></label>
+<label>Aturan waktu <select th:field="*{aturanWaktu}"><option value="">-- Pilih aturan --</option><option value="Sebelum makan">Sebelum makan</option><option value="Sesudah makan">Sesudah makan</option><option value="Bersama makanan">Bersama makanan</option><option value="Sesuai petunjuk dokter">Sesuai petunjuk dokter</option></select></label>
+<label class="check-label"><input type="checkbox" th:field="*{aktif}"> Jadwal aktif</label>
+<div class="form-actions"><a class="btn secondary" th:href="@{/jadwal}">Batal</a><button class="btn primary" type="submit">Simpan Jadwal</button></div></form></main></body></html>

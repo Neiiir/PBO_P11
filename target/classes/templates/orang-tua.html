@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mode Orang Tua | OMIBAT</title><link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="senior-body">
+<div th:replace="~{fragments/navbar :: nav}"></div>
+<main class="container senior-container">
+  <div class="senior-welcome"><div class="eyebrow">MODE ORANG TUA</div><h1>Selamat datang!</h1><p>Berikut jadwal kesehatan yang sudah disiapkan keluarga.</p></div>
+  <div class="notice success-notice" th:if="${param.konfirmasi}">Terima kasih! Konfirmasi minum obat berhasil dicatat.</div>
+  <section class="panel senior-panel">
+    <h2>Jadwal minum obat hari ini</h2>
+    <p class="helper-text">Tekan tombol konfirmasi setelah obat benar-benar diminum.</p>
+    <div th:if="${#lists.isEmpty(jadwal)}" class="empty senior-empty">Belum ada jadwal minum obat.</div>
+    <article class="medication-card" th:each="item : ${jadwal}" th:if="${item.aktif}"
+      th:attr="data-time=${item.waktuMinum},data-confirmed=${item.tanggalKonfirmasi != null and item.tanggalKonfirmasi.equals(hariIni)}">
+      <div class="medication-top">
+        <div class="senior-time" th:text="${item.waktuMinum}">08:00</div>
+        <div class="medication-info">
+          <strong th:text="${item.obat.namaObat}">Nama obat</strong>
+          <p><span th:text="${item.obat.dosis}"></span> · <span th:text="${item.aturanWaktu}"></span></p>
+          <small>Frekuensi: <span th:text="${item.frekuensi}"></span></small>
+        </div>
+      </div>
+      <div class="medication-status status-waiting" aria-live="polite">
+        <span class="status-message">Memuat status jadwal...</span>
+        <strong class="countdown">--:--</strong>
+      </div>
+      <div class="confirmation-detail" th:if="${item.tanggalKonfirmasi != null and item.tanggalKonfirmasi.equals(hariIni)}">
+        Sudah dikonfirmasi hari ini pada <span th:text="${#temporals.format(item.waktuKonfirmasi, 'HH:mm')}">08:00</span>
+      </div>
+      <form th:if="${item.tanggalKonfirmasi == null or !item.tanggalKonfirmasi.equals(hariIni)}"
+            th:action="@{/jadwal/konfirmasi/{id}(id=${item.id})}" method="post" class="confirm-form">
+        <button class="btn confirm-btn" type="submit">✓ Saya Sudah Minum Obat</button>
+      </form>
+      <div class="already-done" th:if="${item.tanggalKonfirmasi != null and item.tanggalKonfirmasi.equals(hariIni)}">✓ Sudah diminum hari ini</div>
+    </article>
+  </section>
+  <section class="panel senior-panel">
+    <h2>Jadwal kontrol dokter</h2>
+    <div th:if="${#lists.isEmpty(kontrol)}" class="empty senior-empty">Belum ada jadwal kontrol.</div>
+    <div class="senior-item" th:each="item : ${kontrol}">
+      <div class="senior-time date-time" th:text="${item.tanggalKontrol}">Tanggal</div>
+      <div><strong th:text="${item.namaDokter}">Nama dokter</strong><p><span th:text="${item.jamKontrol}"></span> · <span th:text="${item.lokasi}"></span></p></div>
+    </div>
+  </section>
+  <a class="btn secondary senior-back" th:href="@{/dashboard}">Kembali ke Dashboard Keluarga</a>
+</main>
+<script>
+(function () {
+  const cards = document.querySelectorAll('.medication-card');
+  function updateCountdown() {
+    const now = new Date();
+    cards.forEach(card => {
+      const status = card.querySelector('.medication-status');
+      const message = card.querySelector('.status-message');
+      const countdown = card.querySelector('.countdown');
+      if (card.dataset.confirmed === 'true') {
+        status.className = 'medication-status status-done';
+        message.textContent = 'Jadwal hari ini sudah dikonfirmasi';
+        countdown.textContent = 'Selesai';
+        return;
+      }
+      const [hours, minutes] = card.dataset.time.split(':').map(Number);
+      const target = new Date(now);
+      target.setHours(hours, minutes, 0, 0);
+      let diff = target - now;
+      if (diff <= 0) {
+        status.className = 'medication-status status-late';
+        message.textContent = 'Peringatan: jadwal minum obat sudah lewat!';
+        countdown.textContent = 'Terlambat';
+      } else {
+        const totalMinutes = Math.floor(diff / 60000);
+        const h = Math.floor(totalMinutes / 60);
+        const m = totalMinutes % 60;
+        status.className = 'medication-status status-waiting';
+        message.textContent = 'Waktu minum obat berikutnya dalam';
+        countdown.textContent = h > 0 ? `${h} jam ${m} menit` : `${m} menit`;
+      }
+    });
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+})();
+</script>
+</body></html>

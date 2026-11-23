@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Dashboard | OMIBAT</title><link rel="stylesheet" th:href="@{/css/style.css}"></head>
+<body><div th:replace="~{fragments/navbar :: nav}"></div>
+<main class="container">
+  <div class="page-heading"><div><div class="eyebrow">RINGKASAN KELUARGA</div><h1>Dashboard</h1><p>Kelola rutinitas kesehatan keluarga dari satu tempat.</p></div><a class="btn primary" th:href="@{/orang-tua}">Tampilan Orang Tua →</a></div>
+  <section class="stats">
+    <article class="stat-card"><span class="stat-label">Total Data Obat</span><strong th:text="${jumlahObat}">0</strong><span class="stat-caption">Obat tersimpan</span></article>
+    <article class="stat-card"><span class="stat-label">Jadwal Minum</span><strong th:text="${jumlahJadwal}">0</strong><span class="stat-caption">Jadwal tercatat</span></article>
+    <article class="stat-card"><span class="stat-label">Kontrol Dokter</span><strong th:text="${jumlahKontrol}">0</strong><span class="stat-caption">Agenda tersimpan</span></article>
+  </section>
+  <div class="section-heading"><div><h2>Akses cepat</h2><p>Pilih data yang ingin dikelola.</p></div></div>
+  <section class="quick-grid">
+    <a class="quick-card" th:href="@{/obat}"><span class="quick-icon">＋</span><div><h3>Data Obat</h3><p>Tambah, ubah, dan hapus data obat</p></div><span class="arrow">→</span></a>
+    <a class="quick-card" th:href="@{/jadwal}"><span class="quick-icon">◷</span><div><h3>Jadwal Minum Obat</h3><p>Atur waktu dan aturan minum</p></div><span class="arrow">→</span></a>
+    <a class="quick-card" th:href="@{/kontrol}"><span class="quick-icon">✚</span><div><h3>Kontrol Dokter</h3><p>Kelola agenda kunjungan dokter</p></div><span class="arrow">→</span></a>
+  </section>
+  <section class="two-columns">
+    <div class="panel"><div class="section-heading"><div><h2>Jadwal minum obat</h2><p>Daftar jadwal yang sudah dicatat.</p></div><a th:href="@{/jadwal}">Lihat semua</a></div>
+      <div th:if="${#lists.isEmpty(jadwal)}" class="empty">Belum ada jadwal. Tambahkan jadwal minum obat terlebih dahulu.</div>
+      <div class="simple-list" th:each="item : ${jadwal}"><div><strong th:text="${item.obat.namaObat}">Nama obat</strong><small th:text="${item.aturanWaktu}">Aturan</small></div><span class="time" th:text="${item.waktuMinum}">08:00</span></div>
+    </div>
+    <div class="panel"><div class="section-heading"><div><h2>Kontrol dokter</h2><p>Agenda kontrol yang tersimpan.</p></div><a th:href="@{/kontrol}">Lihat semua</a></div>
+      <div th:if="${#lists.isEmpty(kontrol)}" class="empty">Belum ada jadwal kontrol dokter.</div>
+      <div class="simple-list" th:each="item : ${kontrol}"><div><strong th:text="${item.namaDokter}">Nama dokter</strong><small th:text="${item.lokasi}">Lokasi</small></div><span class="time" th:text="${item.tanggalKontrol}">Tanggal</span></div>
+    </div>
+  </section>
+</main></body></html>

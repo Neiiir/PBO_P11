@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OMIBAT | Beranda</title><link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: nav}"></div>
+<main class="hero-wrap">
+  <section class="hero">
+    <div class="eyebrow">PENDAMPING KESEHATAN KELUARGA</div>
+    <h1>Perhatian kecil,<br><span>berarti besar</span> untuk keluarga.</h1>
+    <p>OMIBAT membantu keluarga mengatur jadwal minum obat, memantau rutinitas, dan mengingat jadwal kontrol dokter orang tua.</p>
+    <div class="hero-actions">
+      <a class="btn primary" th:href="@{/dashboard}">Buka Dashboard</a>
+      <a class="btn secondary" th:href="@{/orang-tua}">Lihat Mode Orang Tua</a>
+    </div>
+    <div class="hero-note"><span class="dot"></span> Satu tempat untuk membantu rutinitas kesehatan keluarga</div>
+  </section>
+  <section class="hero-art">
+    <div class="art-circle"></div>
+    <div class="art-card main-art"><div class="art-icon">♥</div><h3>Jaga rutinitas sehat</h3><p>Jadwal lebih teratur, keluarga lebih tenang.</p><div class="art-pill">OMIBAT care</div></div>
+    <div class="floating-pill pill-one">✓ Jadwal tersimpan</div>
+    <div class="floating-pill pill-two">♡ Untuk keluarga</div>
+  </section>
+</main>
+<section class="feature-row">
+  <article class="feature"><div class="feature-icon">＋</div><h3>Data Obat</h3><p>Catat nama obat, dosis, dan aturan minum.</p></article>
+  <article class="feature"><div class="feature-icon">◷</div><h3>Jadwal Minum</h3><p>Atur waktu minum dan aturan sebelum atau sesudah makan.</p></article>
+  <article class="feature"><div class="feature-icon">✚</div><h3>Kontrol Dokter</h3><p>Simpan tanggal, jam, dan lokasi kontrol berikutnya.</p></article>
+</section>
+</body></html>

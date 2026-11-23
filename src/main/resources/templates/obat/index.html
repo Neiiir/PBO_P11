@@ -1,0 +1,7 @@
+<!DOCTYPE html><html lang="id" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Data Obat | OMIBAT</title><link rel="stylesheet" th:href="@{/css/style.css}"></head><body>
+<div th:replace="~{fragments/navbar :: nav}"></div><main class="container">
+<div class="page-heading"><div><div class="eyebrow">PENGELOLAAN DATA</div><h1>Data Obat</h1><p>Catat obat yang digunakan orang tua.</p></div><a class="btn primary" th:href="@{/obat/tambah}">＋ Tambah Obat</a></div>
+<div class="panel table-panel"><div th:if="${#lists.isEmpty(daftarObat)}" class="empty">Belum ada data obat. Klik “Tambah Obat” untuk mulai mengisi.</div>
+<table th:unless="${#lists.isEmpty(daftarObat)}"><thead><tr><th>Nama Obat</th><th>Dosis</th><th>Aturan Minum</th><th>Keterangan</th><th>Aksi</th></tr></thead><tbody>
+<tr th:each="item : ${daftarObat}"><td th:text="${item.namaObat}"></td><td th:text="${item.dosis}"></td><td th:text="${item.aturanMinum}"></td><td th:text="${item.keterangan}"></td><td class="actions"><a class="text-link" th:href="@{/obat/edit/{id}(id=${item.id})}">Edit</a><form th:action="@{/obat/hapus/{id}(id=${item.id})}" method="post" onsubmit="return confirm('Hapus data obat ini?')"><button class="delete-link" type="submit">Hapus</button></form></td></tr>
+</tbody></table></div></main></body></html>
